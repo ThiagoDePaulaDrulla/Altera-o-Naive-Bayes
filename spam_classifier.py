@@ -1,3 +1,10 @@
+
+#Visando aumentar a eficácia do código inseri também uma busca por palavras e símbolos que geralmente estão presentes ema assuntos de email de spam
+# como '!', '$' e 'No cost', adicionando a busca por esses dados o numero de acertos tanto True/True quanto False/False melhorou bastante
+#os erros por sua vez tiveram um aumento bem inferior
+#Segui esses caminho após consultar um artigo da justiça de Santa Catarina que detalha as possíveis caracteristicas de emails de Spam https://www.tjsc.jus.br/web/servidor/dicas-de-ti/-/asset_publisher/0rjJEBzj2Oes/content/saiba-identificar-uma-mensagem-eletronica-indesejada
+#Sendo uma delas a 'apresentar no campo Assunto textos alarmantes ou vagos;'
+
 from typing import TypeVar, List, Tuple, Dict, Iterable, NamedTuple, Set
 from collections import defaultdict, Counter
 import re
@@ -24,7 +31,7 @@ class Message(NamedTuple):
     is_spam: bool
 
 class NaiveBayesClassifier:
-    def __init__(self, k: float = 0.5) -> None:
+    def __init__(self, k: float = 0.5) -> None: 
         self.k = k  # smoothing factor
 
         self.tokens: Set[str] = set()
@@ -130,7 +137,6 @@ import glob
 
 # modify the path to wherever you've put the files
 path = 'emails/*/*'
-
 data: List[Message] = []
 
 # glob.glob returns every filename that matches the wildcarded path
@@ -142,6 +148,10 @@ for filename in glob.glob(path):
     with open(filename, errors='ignore') as email_file:
         for line in email_file:
             if line.startswith("Subject:"):
+                #buscando palavras ou símbolos que geralmente estão presentes em assuntos de de emails de spam consiguimos aumentar bastante a eficacia do código
+                if(line.find("!") != -1 or line.find("$") != -1 or line.find("No Cost") != -1):
+                    subject = line.lstrip("Subject: ")
+                    data.append(Message(subject, is_spam))
                 subject = line.lstrip("Subject: ")
                 data.append(Message(subject, is_spam))
                 break  # done with this file
@@ -169,7 +179,7 @@ def p_spam_given_token(token: str, model: NaiveBayesClassifier) -> float:
 
 words = sorted(model.tokens, key=lambda t: p_spam_given_token(t, model))
 
-print("spammiest_words", words[-10:])
-print("hammiest_words", words[:10])
+#print("spammiest_words", words[-10:])
+#print("hammiest_words", words[:10])
 
 #if __name__ == "__main__": main()
