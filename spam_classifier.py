@@ -4,6 +4,7 @@
 #os erros por sua vez tiveram um aumento bem inferior
 #Segui esses caminho após consultar um artigo da justiça de Santa Catarina que detalha as possíveis caracteristicas de emails de Spam https://www.tjsc.jus.br/web/servidor/dicas-de-ti/-/asset_publisher/0rjJEBzj2Oes/content/saiba-identificar-uma-mensagem-eletronica-indesejada
 #Sendo uma delas a 'apresentar no campo Assunto textos alarmantes ou vagos;'
+#O segundo passo foi verificar todo o conteudo de mensagem e usando como base a lógica dos radicais das palavras apliquei a busca pela palavra 'like' que representou um grande número de acertos e grade redução de erros
 
 from typing import TypeVar, List, Tuple, Dict, Iterable, NamedTuple, Set
 from collections import defaultdict, Counter
@@ -147,6 +148,9 @@ for filename in glob.glob(path):
     # skips them instead of raising an exception.
     with open(filename, errors='ignore') as email_file:
         for line in email_file:
+            #Só usando a simples palavra like varios spams foram identificados
+            if line.find("like") != -1:
+                data.append(Message(line, is_spam))
             if line.startswith("Subject:"):
                 #buscando palavras ou símbolos que geralmente estão presentes em assuntos de de emails de spam consiguimos aumentar bastante a eficacia do código
                 if(line.find("!") != -1 or line.find("$") != -1 or line.find("No Cost") != -1):
